@@ -1,6 +1,8 @@
 # Written by Nitish Kanna
 # 20/06/2024, India
 
+# 22/06/2024, added left hand and right hand distinction
+
 # Data type for storing and accessing Mediapipe Hand Landmark data in the most
 # convenient way.
 
@@ -14,15 +16,14 @@ middle = 13
 ring = 17
 pinky = 21
 
-__version__ = '0.0.1'
-
 class Hand:
     # hand_data stores the multi_hand_landmarks object returned by hands.process() method
     # width and height correspond to the display frame's dimensions
-    def __init__(self, hand_data, width, height): 
+    def __init__(self, results, width, height): 
         self.hands = []
+        self.handTypes = []
 
-        for hand in hand_data:
+        for hand in results.multi_hand_landmarks:
            landmarks = []
 
            for landmark in hand.landmark:
@@ -30,6 +31,12 @@ class Hand:
                ypos = int(landmark.y * height)
                landmarks.append((xpos, ypos)) 
            self.hands.append(landmarks)
+        
+        # results.multi_handedness is a list of classification objects
+        # each classification object has a list of handedness properties
+        for hand in results.multi_handedness:
+            handedness = hand.classification[0].label
+            self.handTypes.append(handedness)
 
     # method for extracting a finger's landmarks
     def finger(self, fcode, hand):
@@ -64,14 +71,22 @@ class Hand:
         return fingers
 
     # method for marking the landmarks of a hand with red spots
-    def markup(self, frame, fcode = -1, max_hands = -1):
+    def markup(self, frame, fcode = -1, max_hands = -1, htype = -1):
         if max_hands == -1: # mark all hands
                 max_hands = len(self.hands)
         drawn = 0 # number of hands marked
 
-        for hand in self.hands:
+        for hand, handType in zip(self.hands, self.handTypes):
             if drawn == max_hands:
                 continue
+
+            if htype != -1 and handType != htype: # mark either left hand or right hand
+                continue
+
+            if handType == 'Right':
+                hColor = (0, 255, 0)
+            else:
+                hColor = (0, 0, 255)
 
             landmarks = []
             if fcode == -1: # mark all fingers
@@ -81,7 +96,7 @@ class Hand:
             
             for landmark in landmarks:
                 cv2.circle(frame, landmark, 4, (150, 150, 150), 2)
-                cv2.circle(frame, landmark, 3, (0, 0, 255), -1)
+                cv2.circle(frame, landmark, 3, hColor, -1)
             drawn += 1
 
     # method for displaying the HandMarks data structure
