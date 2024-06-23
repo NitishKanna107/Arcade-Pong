@@ -7,6 +7,7 @@
 # convenient way.
 
 import cv2
+__version__ = '0.0.1'
 
 # finger codes representing the ending index in the landmarks list
 wrist = 1

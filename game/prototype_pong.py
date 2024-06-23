@@ -8,6 +8,7 @@ import mediapipe as mp
 import gesture
 
 import random
+import math
 
 cam = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -29,7 +30,7 @@ pad_left = 0, 0 # upper left corner of the paddle
 pad_right = 0, 0 # lower right corner of the paddle
 centerx = 50 # x coordinate of the center of the paddle
 
-ball_x = int(width/2) # spawn point of the ball
+ball_x = int(width/2) # spawn point of the ball 
 ball_y = int(height) - 15
 
 min_speed, max_speed = 10, 11
@@ -61,7 +62,7 @@ def game_run(frame, gameFrame):
     results = hands.process(frameRGB)
 
     if results.multi_hand_landmarks != None: 
-        myHands = gesture.Hand(results.multi_hand_landmarks, width, height)
+        myHands = gesture.Hand(results, width, height)
         myHands.markup(frame, gesture.index)
         indexFinger = myHands.finger(gesture.index, myHands.hands[0]) # landmarks of the index finger
         centerx = (indexFinger[3][0] / width) * gwidth # x coordinate of the tip of the index finger mapped to game frame size
@@ -87,15 +88,22 @@ def game_run(frame, gameFrame):
 
 try:
     hands = mp.solutions.hands.Hands(False, 1, 1, .5, .5) 
+    gameRunning = False
 
-    while cv2.waitKey(1) != ord('q'):
+    while cv2.waitKey(1) & 0xFF != ord('q'):
         ret, frame = cam.read()
         gameFrame = np.zeros((525, 858, 3), dtype=np.uint8)
         
-        if lives != 0:
-            game_run(frame, gameFrame)
+        if gameRunning == False:
+            cv2.putText(gameFrame, "Press 's' to start", (gwidth // 2 - 300, gheight // 2), cv2.FONT_HERSHEY_COMPLEX, 1.5, (255, 0, 0), 2)
+            if cv2.waitKey(1) & 0xFF == ord('s'):
+                gameRunning = True
         else:
-            cv2.putText(gameFrame, 'Game Over!', (gwidth // 2 - 150, gheight // 2), cv2.FONT_HERSHEY_COMPLEX, 1.5, (0, 0, 255), 2)
+            if lives != 0:
+                game_run(frame, gameFrame)
+            else:
+                cv2.putText(gameFrame, 'Game Over!', (gwidth // 2 - 150, gheight // 2), cv2.FONT_HERSHEY_COMPLEX, 1.5, (0, 0, 255), 2)
+
         
         cv2.imshow('Game', gameFrame)
         cv2.moveWindow('Game', 0, 0)

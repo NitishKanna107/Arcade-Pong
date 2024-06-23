@@ -21,8 +21,8 @@ pip install numpy==1.26.4
 Currently, only a prototype of the game is available with limited features. You can try it out and give me constructive feedback that I can implement in the actual release version of the game.
 
 To run the prototype version of the game follow the steps below:
-- Open the prototype directory `Arcade-Pong/prototype`
-- Run the `game.py` script present inside the directory
+- Open the game directory `Arcade-Pong/game/`
+- Run the `prototype_pong.py` script present inside the directory
 - To quit the game just press the `'q' key`
 
 ## Contribute
