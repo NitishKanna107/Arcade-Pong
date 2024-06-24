@@ -42,14 +42,14 @@ lives = 3
 
 def update_pos():
     global move_x, move_y
-    if ball_x <= 16:
+    if ball_x <= 15:
         move_x = random.randint(min_speed, max_speed)
-    elif ball_x >= (gwidth - 30):
+    elif ball_x >= (gwidth - 15):
         move_x = random.randint(min_speed, max_speed) * -1
     
     if ball_y <= 16:
         return False
-    elif ball_y >= (gheight - 30):
+    elif ball_y >= (gheight - 15):
         move_y = random.randint(min_speed, max_speed) * -1
     
     return True
@@ -92,7 +92,7 @@ try:
 
     while cv2.waitKey(1) & 0xFF != ord('q'):
         ret, frame = cam.read()
-        gameFrame = np.zeros((525, 858, 3), dtype=np.uint8)
+        gameFrame = np.zeros((gheight, gwidth, 3), dtype=np.uint8)
         
         if gameRunning == False:
             cv2.putText(gameFrame, "Press 's' to start", (gwidth // 2 - 300, gheight // 2), cv2.FONT_HERSHEY_COMPLEX, 1.5, (255, 0, 0), 2)
