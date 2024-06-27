@@ -1,18 +1,30 @@
+# import the necessary packages
+from threading import Thread
 import cv2
-import numpy as np
-
-while cv2.waitKey(1) != ord('q'):
-    frame = np.zeros((525, 858, 3), dtype=np.uint8)
-    title = [858 // 2 - 230, 70]
-    player1 = [(858 // 2 - 100), title[1] + 90]
-    player2 = [player1[0], player1[1] + 70]
-    gamequit = [player2[0] + 60, player2[1] + 70]
-    version = [30, 500]
-    cv2.putText(frame, 'Arcade-Pong', title, cv2.FONT_HERSHEY_COMPLEX, 2, (255, 255, 255), 4)
-    cv2.putText(frame, 'ONE-PLAYER', player1, cv2.FONT_HERSHEY_PLAIN, 2, (140, 140, 140), 2)
-    cv2.putText(frame, 'TWO-PLAYER', player2, cv2.FONT_HERSHEY_PLAIN, 2, (140, 140, 140), 2)
-    cv2.putText(frame, 'QUIT', gamequit, cv2.FONT_HERSHEY_PLAIN, 2, (140, 140, 140), 2)
-    cv2.putText(frame, 'version 0.0.1', version, cv2.FONT_HERSHEY_PLAIN, 1.3, (255, 255, 255), 1)
-
-    cv2.imshow('Capture', frame)
-    cv2.moveWindow('Capture', 0, 0)
+class WebcamVideoStream:
+	def __init__(self, src=0):
+		# initialize the video camera stream and read the first frame
+		# from the stream
+		self.stream = cv2.VideoCapture(src)
+		(self.grabbed, self.frame) = self.stream.read()
+		# initialize the variable used to indicate if the thread should
+		# be stopped
+		self.stopped = False
+    def start(self):
+	# start the thread to read frames from the video stream
+	    Thread(target=self.update, args=()).start()
+	    return self
+	def update(self):
+		# keep looping infinitely until the thread is stopped
+		while True:
+			# if the thread indicator variable is set, stop the thread
+			if self.stopped:
+				return
+			# otherwise, read the next frame from the stream
+			(self.grabbed, self.frame) = self.stream.read()
+	def read(self):
+		# return the frame most recently read
+		return self.frame
+	def stop(self):
+		# indicate that the thread should be stopped
+		self.stopped = True

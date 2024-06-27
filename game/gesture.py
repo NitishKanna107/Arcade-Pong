@@ -103,7 +103,7 @@ class Hand:
     # method for displaying the HandMarks data structure
     def struct(self):
         for i in range(len(self.hands)): 
-            print(f'{i}. Hand [') # prints the hand number
+            print(f'{i}. Hand ({self.handTypes[i]}) [') # prints the hand number
             fingers = Hand.finger_dict(self.hands[i])
 
             for finger, fingermarks in fingers.items(): # prints the landmark data for each finger
